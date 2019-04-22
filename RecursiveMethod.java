@@ -1,63 +1,48 @@
+// Program Name: Recursive Method
+// Programmer: Kevin Saravia, 1478627
+// Assignment Number: Project #3
+/* Purpose: This program uses recursion to find out how many 
+            different combos of coins you can get from a given 
+            cent amount less than $1*/
 import java.io.*;
 import java.util.Scanner;
 
 public class RecursiveMethod{
-  public static int amount;
-  public static int quart, dim, nick, pen;
+  public static int q = 0, d = 0, n = 0, p = 0;
   public static int ways = 1;
   public static void main(String[] args){
     Scanner scan = new Scanner(System.in);
     System.out.print("Input the amount between 1 and 99: ");
     int inp = scan.nextInt();
+    while(inp < 1 || inp > 99){
+      System.out.println("Error: Invalid Input.");
+      System.out.print("Input the amount between 1 and 99: ");
+      inp = scan.nextInt();
+    }
     System.out.println();
-    RecursiveMethod update = new RecursiveMethod(inp);
-    quart = ways(update, 4);
-    dim = ways(update, 3);
-    nick = ways(update, 2);
-    pen = ways(update, 1);
-    printResult(quart, dim, nick, pen);
-    System.out.print("\nThere are totally " + result(quart, 
-      dim, nick, pen) + " ways.");
+
+    logicalDivide(inp, 4);
+    printResult(q, d, n, p);
+    System.out.print("\nThere are totally " 
+      + ways(inp, 4) + " ways.");
     scan.close();
   }
 
-  public static int ways(RecursiveMethod obj, int denomination){
-    int denomVal = 0;
-
-    switch(denomination){
-      case 4:
-        denomVal = 25;
-        break;
-      case 3:
-        denomVal = 10;
-        break;
-      case 2:
-        denomVal = 5;
-        break;
-      case 1:
-        denomVal = 1;
-        break;  
-    }
-
-    if(obj.getAmount() < denomVal)
-      return 0;
-    else{
-      obj.updating(denomVal);
-      return (1 + ways(obj, denomination));
-    }
-  }
-
-  public static int result(int q, int d, int n, int p){
+  public static int ways(int amounts, int denomination){
     if(n > 0){
       ways++;
-      printResult(q, d, n - 1, p + 5);
-      result(q, d, n - 1, p + 5);
+      n -= 1;
+      p += 5;
+      printResult(q, d, n, p);
+      ways(amounts, denomination);
     }
     if(d > 0 & n == 0){
-      n += p / 5;
       ways++;
-      printResult(q, d - 1, n + 2, p % 5);
-      result(q, d - 1, n + 2, p % 5);
+      n += p / 5 + 2;
+      p %= 5;
+      d -= 1;
+      printResult(q, d, n, p);
+      ways(amounts, denomination);
     }
     if(q > 0 & d == 0 & n == 0){
       ways++;
@@ -66,27 +51,50 @@ public class RecursiveMethod{
       p %= 10;
       n += p / 5;
       p %= 5;
-      printResult(q - 1, d, n, p);
-      result(q - 1, d, n, p);
+      q -= 1;
+      printResult(q, d, n, p);
+      ways(amounts, denomination);
     }
 
     return ways;
   }
 
-  public RecursiveMethod(int start){
-    amount = start;
+  public static void logicalDivide(int amt, int den){
+    int denomVal = 0;
+
+    if(amt != 0){
+      switch(den){
+        case 4:
+          denomVal = 25;
+          if(amt >= denomVal)
+            q++;
+          break;
+        case 3:
+          denomVal = 10;
+          if(amt >= denomVal)
+            d++;
+          break;
+        case 2:
+          denomVal = 5;
+          if(amt >= denomVal)
+            n++;
+          break;
+        case 1:
+          denomVal = 1;
+          if(amt >= denomVal)
+            p++;
+          break;  
+      }
+
+      if(amt < denomVal)
+        logicalDivide(amt, den - 1);
+      else
+        logicalDivide(amt - denomVal, den);
+    }
   }
 
-  public int getAmount(){
-    return amount;
-  }
-
-  public void updating(int increment){
-    amount -= increment;
-  }
-
-  public static void printResult(int q, int d, int n, int p){
-    System.out.println("There are " + q + " quarter, " + d
-      + " dime, " + n + " nickel, " + p + " penny");
+  public static void printResult(int qu, int di, int ni, int pe){
+    System.out.println("There are " + qu + " quarter, " + di
+      + " dime, " + ni + " nickel, " + pe + " penny");
   }
 }
